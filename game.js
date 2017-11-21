@@ -31,22 +31,13 @@ class Vec2 {
     }
 }
 
-/* Class to store blocks with their colors */
-class Block {
-    constructor(pos, color) {
-        this.x = pos.x;
-        this.y = pos.y;
-        this.color = color;
-    }
-}
-
 /* Background class to maybe implement backgroung images */
 class Background {
     constructor(color) {
         this.color = color;
     }
 
-    update() {
+    draw() {
         ctx.fillStyle = this.color;
         ctx.fillRect(0, 0, canv.width, canv.height);
     }
@@ -54,22 +45,64 @@ class Background {
 
 class Playfield {
     constructor() {
-        this.grid = [];
+        this.grid = new Array(10);
+        for (var i = 0; i < this.grid.length; i++) {
+            this.grid[i] = new Array(20);
+            for (var j = 0; j < this.grid[i].length; j++) {
+                this.grid[i][j] = "0";
+            }
+        }
     }
 
     update() {
-        this.draw();
+        var row = this.scan();
+        for (var i = 0; i < row.length; i++) {
+            if (row[i] === 10) {
+                for (var j = 0; j < this.grid.length; j++) {
+                    this.grid[j][i] = "0";
+                }
+            }
+        }
+        row = this.scan();
+        for (var i = this.grid[0].length; i > 0; i--) {
+            if (row[i] === 0) {
+                for (var j = 0; j < this.grid.length; j++) {
+                    this.grid[j][i] = this.grid[j][i - 1];
+                    this.grid[j][i - 1] = "0";
+                }
+            }
+        }
+    }
+
+    scan() {
+        var row = new Array(this.grid[0].length);
+        for (var i = 0; i < row.length; i++) {
+            row[i] = 0;
+        }
+        for (var i = 0; i < this.grid.length; i++) {
+            for (var j = 0; j < this.grid[i].length; j++) {
+                if (this.grid[i][j].charAt(0) === "#") {
+                    row[j]++;
+                }
+            }
+        }
+
+        return row;
     }
 
     draw() {
         for (var i = 0; i < this.grid.length; i++) {
-            ctx.fillStyle = colors[this.grid[i].color];
-            ctx.fillRect(this.grid[i].x * gridSize, this.grid[i].y * gridSize, gridSize, gridSize);
+            for (var j = 0; j < this.grid[i].length; j++) {
+                if (this.grid[i][j].charAt(0) === "#") {
+                    ctx.fillStyle = this.grid[i][j];
+                    ctx.fillRect(i * gridSize, j * gridSize, gridSize, gridSize);
+                }
+            }
         }
     }
 
     append(block, color) {
-        this.grid.push(new Block(block, color));
+        this.grid[block.x][block.y] = color;
     }
 
     canMoveDown(piece, pos) {
@@ -77,8 +110,8 @@ class Playfield {
             if (piece[i].y + pos.y > canv.height / gridSize - 2) {
                 return false;
             }
-            for (var j = 0; j < this.grid.length; j++) {
-                if (piece[i].x + pos.x === this.grid[j].x && piece[i].y + pos.y + 1 === this.grid[j].y) {
+            if (piece[i].x + pos.x >= 0 && piece[i].y + pos.y >= -1) {
+                if (this.grid[piece[i].x + pos.x][piece[i].y + pos.y + 1].charAt(0) === "#") {
                     return false;
                 }
             }
@@ -91,10 +124,8 @@ class Playfield {
             if (piece[i].x + pos.x >= canv.width / gridSize - 1) {
                 return false;
             }
-            for (var j = 0; j < this.grid.length; j++) {
-                if (piece[i].x + pos.x + 1 === this.grid[j].x && piece[i].y + pos.y === this.grid[j].y) {
-                    return false;
-                }
+            if (this.grid[piece[i].x + pos.x + 1][piece[i].y + pos.y].charAt(0) === "#") {
+                return false;
             }
         }
         return true;
@@ -105,10 +136,8 @@ class Playfield {
             if (piece[i].x + pos.x <= 0) {
                 return false;
             }
-            for (var j = 0; j < this.grid.length; j++) {
-                if (piece[i].x + pos.x - 1 === this.grid[j].x && piece[i].y + pos.y === this.grid[j].y) {
-                    return false;
-                }
+            if (this.grid[piece[i].x + pos.x - 1][piece[i].y + pos.y].charAt(0) === "#") {
+                return false;
             }
         }
         return true;
@@ -124,10 +153,9 @@ class Tetromino {
     update() {
         if (playfield.canMoveDown(this.block, this.pos)) {
             this.pos.y++;
-            this.draw();
         } else {
             for (var i = 0; i < this.block.length; i++) {
-                playfield.append(new Vec2(this.block[i].x + this.pos.x, this.block[i].y + this.pos.y), this.type);
+                playfield.append(new Vec2(this.block[i].x + this.pos.x, this.block[i].y + this.pos.y), colors[this.type]);
             }
             this.reset();
         }
@@ -145,47 +173,41 @@ class Tetromino {
     right() {
         if (playfield.canMoveRight(this.block, this.pos)) {
             this.pos.x++;
-            background.draw();
-            playfield.draw();
-            this.draw();
         }
     }
 
     left() {
         if (playfield.canMoveLeft(this.block, this.pos)) {
             this.pos.x--;
-            background.draw();
-            playfield.draw();
-            this.draw();
         }
     }
 
     reset() {
-        this.type = rand(7);
+        this.type = rand(0, 7);
         this.block = blocks[this.type][0];
-        this.pos = new Vec2(rand(11 - blocks[this.type][1]), 0);
+        this.pos = new Vec2(rand(blocks[this.type][1], blocks[this.type][2]), 0);
     }
 }
 
 
 /* The hearth of the game */
 function gameLoop() {
-    background.update();
-    
+    background.draw();
+    ctx.fillStyle = "#008FFF";
+    ctx.fillText(a, 10, 10);
     if (a === 0) {
         active.update();
-        a = 5;
-    } else {
-        active.draw();
-        a--;
+        playfield.update();
+        a = 8;
     }
-    
-    playfield.update();
+    a--;
+    active.draw();
+    playfield.draw();
 }
 
 /* Function to create random? positive integers */
-function rand(max) {
-    return Math.floor(Math.random() * max);
+function rand(min, max) {
+    return min + Math.floor(Math.random() * (max - min));
 }
 
 /* Function to handle keyboard events */
@@ -195,7 +217,7 @@ function keyPush(evt) {
             active.left();
             break;
         case 38:        // Up Arrow
-            // rotate 
+            // rotate
             break;
         case 39:        // Right Arrow
             active.right();
@@ -212,13 +234,13 @@ function keyPush(evt) {
 
 /* Templates for all possible tetrominos */
 var blocks = [
-    [[new Vec2(0, -1), new Vec2(1, -1), new Vec2(2, -1), new Vec2(3, -1)], 4],  // I
-    [[new Vec2(0, -2), new Vec2(1, -2), new Vec2(0, -1), new Vec2(1, -1)], 3],  // O
-    [[new Vec2(1, -2), new Vec2(0, -1), new Vec2(1, -1), new Vec2(2, -1)], 3],  // T
-    [[new Vec2(1, -2), new Vec2(2, -2), new Vec2(0, -1), new Vec2(1, -1)], 3],  // S
-    [[new Vec2(0, -2), new Vec2(1, -2), new Vec2(1, -1), new Vec2(2, -1)], 3],  // Z
-    [[new Vec2(0, -2), new Vec2(0, -1), new Vec2(1, -1), new Vec2(2, -1)], 3],  // J
-    [[new Vec2(2, -2), new Vec2(0, -1), new Vec2(1, -1), new Vec2(2, -1)], 3]   // L
+    [[new Vec2(-1, -1), new Vec2(0, -1), new Vec2(1, -1), new Vec2(2, -1)], 1, 7],  // I
+    [[new Vec2(0, -2), new Vec2(1, -2), new Vec2(0, -1), new Vec2(1, -1)], 0, 8],   // O
+    [[new Vec2(1, -2), new Vec2(0, -1), new Vec2(1, -1), new Vec2(2, -1)], 0, 8],   // T
+    [[new Vec2(1, -2), new Vec2(2, -2), new Vec2(0, -1), new Vec2(1, -1)], 0, 8],   // S
+    [[new Vec2(0, -2), new Vec2(1, -2), new Vec2(1, -1), new Vec2(2, -1)], 0, 8],   // Z
+    [[new Vec2(0, -2), new Vec2(0, -1), new Vec2(1, -1), new Vec2(2, -1)], 0, 8],   // J
+    [[new Vec2(2, -2), new Vec2(0, -1), new Vec2(1, -1), new Vec2(2, -1)], 0, 8]    // L
 ];
 
 
@@ -226,5 +248,5 @@ var blocks = [
 var background = new Background(bgColor);
 var playfield = new Playfield();
 var active = new Tetromino();
-var a = 5; 
+var a = 0; 
 setInterval(gameLoop, 1000/60);
