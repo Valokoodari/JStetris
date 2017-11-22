@@ -230,19 +230,33 @@ class Tetromino {
 
 /* The hearth of the game */
 function mainLoop() {
-    background.draw();
-    sdp.fillStyle = "#008FFF";
-    sdp.font = "30px Roboto";
-    sdp.fillText(score, 10, 30);
-    if (a === 0) {
-        active.update();
-        playfield.update();
-        a = speed;
+    if (!paused) {
+        background.draw();
+        sdp.fillStyle = "#008FFF";
+        sdp.font = "30px Roboto";
+        sdp.fillText(score, 10, 30);
+        if (a === 0) {
+            active.update();
+            playfield.update();
+            a = speed;
+        }
+        a--;
+        active.draw();
+        active.drawNext();
+        playfield.draw();
+    } else {
+        ctx.fillStyle = "#008FFF";
+        ctx.font = "30px Roboto";
+        ctx.fillText("Paused.", 10, 30);
     }
-    a--;
-    active.draw();
-    active.drawNext();
-    playfield.draw();
+}
+
+function pause() {
+    if (paused) {
+        paused = false;
+    } else {
+        paused = true;
+    }
 }
 
 function clear() {
@@ -282,6 +296,9 @@ function keyPush(evt) {
         case 82:        // R
             clear();
             break;
+        case 27:        // ESC
+            pause();
+            break;
     }
 }
 
@@ -310,4 +327,5 @@ var score = 0;
 var lines = 0;
 var level = 1;
 var a = 0;
+var paused = false;
 setInterval(mainLoop, 1000/60);

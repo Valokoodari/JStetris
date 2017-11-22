@@ -6,5 +6,6 @@
 - [x] Next Piece Indicator
 - [x] Scoring System
 - [x] Levels
+- [x] Pause
 - [ ] Piece Holding System?
 - [ ] Option to play with pentominoes?
