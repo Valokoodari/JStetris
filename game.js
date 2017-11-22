@@ -276,6 +276,9 @@ function rand(min, max) {
 
 /* Function to handle keyboard events */
 function keyPush(evt) {
+    if([32, 37, 38, 39, 40].indexOf(evt.keyCode) > -1) {
+        evt.preventDefault();
+    }
     switch(evt.keyCode) {
         case 37:        // Left Arrow
         case 65:        // A
