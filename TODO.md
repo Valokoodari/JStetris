@@ -3,7 +3,8 @@
 - [x] Only One CanMove() Function
 - [ ] Background Images
 - [ ] Increasing Speed
-- [x] Next Piece Display
+- [x] Next Piece Indicator
 - [x] Scoring System
+- [x] Levels
 - [ ] Piece Holding System?
-- [ ] Option to play with pentominoes
+- [ ] Option to play with pentominoes?

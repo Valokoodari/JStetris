@@ -69,7 +69,7 @@ class Playfield {
                 }
             }
         }
-        var dest = -1;
+        var dest = 0;
         var cont = 0;
         rows = this.scan();
         for (var i = 0; i < this.grid[0].length; i++) {
@@ -86,8 +86,13 @@ class Playfield {
                 }
             }
         }
-        if (dest >= 0) {
-            score += scores[dest];
+        if (dest > 0) {
+            score += level * scores[dest - 1];
+            lines += dest;
+            if (lines > 8) {
+                level++;
+                lines -= 8;
+            }
         }
     }
 
@@ -273,13 +278,13 @@ function keyPush(evt) {
 
 /* Templates for all possible tetrominos */
 var blocks = [
-    [[new Vec2(-1, 0), new Vec2( 0, 0), new Vec2( 1, 0), new Vec2(2, 0)], 1, 7],    // I (Final)
-    [[new Vec2(-1, -1), new Vec2( 0, -1), new Vec2(-1, 0), new Vec2(0, 0)], 1, 9],    // O
-    [[new Vec2( 0, -1), new Vec2(-1, 0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],    // T
-    [[new Vec2( 0, -1), new Vec2( 1, -1), new Vec2(-1, 0), new Vec2(0, 0)], 1, 9],    // S
-    [[new Vec2(-1, -1), new Vec2( 0, -1), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],    // Z
-    [[new Vec2(-1, -1), new Vec2(-1, 0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],    // J
-    [[new Vec2( 1, -1), new Vec2(-1, 0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9]     // L
+    [[new Vec2(-1,  0), new Vec2( 0,  0), new Vec2( 1, 0), new Vec2(2, 0)], 1, 7],  // I
+    [[new Vec2(-1, -1), new Vec2( 0, -1), new Vec2(-1, 0), new Vec2(0, 0)], 1, 9],  // O
+    [[new Vec2( 0, -1), new Vec2(-1,  0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],  // T
+    [[new Vec2( 0, -1), new Vec2( 1, -1), new Vec2(-1, 0), new Vec2(0, 0)], 1, 9],  // S
+    [[new Vec2(-1, -1), new Vec2( 0, -1), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],  // Z
+    [[new Vec2(-1, -1), new Vec2(-1,  0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],  // J
+    [[new Vec2( 1, -1), new Vec2(-1,  0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9]   // L
 ];
 
 
@@ -292,5 +297,7 @@ var width = canv.width / gridSize;
 var height = canv.height / gridSize;
 
 var score = 0;
-var a = 0; 
+var lines = 0;
+var level = 1;
+var a = 0;
 setInterval(mainLoop, 1000/60);
