@@ -1,8 +1,8 @@
 /* Global canvas, context, and time */
 var canv = document.getElementById("tetrisCanvas");
 var ctx = canv.getContext("2d");
-var sCanv = document.getElementById("scoreCanvas");
-var scr = sCanv.getContext("2d");
+var sCanv = document.getElementById("sideCanvas");
+var sdp = sCanv.getContext("2d");
 //var d = new Date();
 
 /* Start keyboard event listener */
@@ -11,7 +11,7 @@ document.addEventListener("keydown", keyPush);
 /* Basic settings */
 var bgColor = "#2D2D2D";    // Default #2D2D2D
 var gridSize = 40;          // Default 40
-var speed = 8;             // Default 8
+var speed = 8;              // Default 8
 
 /* Color palette for tetrominos */
 var colors = [
@@ -44,8 +44,8 @@ class Background {
     draw() {
         ctx.fillStyle = this.color;
         ctx.fillRect(0, 0, canv.width, canv.height);
-        scr.fillStyle = this.color;
-        scr.fillRect(0, 0, canv.width, canv.height);
+        sdp.fillStyle = this.color;
+        sdp.fillRect(0, 0, sCanv.width, sCanv.height);
     }
 }
 
@@ -98,7 +98,7 @@ class Playfield {
         }
         for (var i = 0; i < this.grid.length; i++) {
             for (var j = 0; j < this.grid[i].length; j++) {
-                if (this.grid[i][j].charAt(0) === "#") {
+                if (this.grid[i][j] !== "0") {
                     row[j]++;
                 }
             }
@@ -110,7 +110,7 @@ class Playfield {
     draw() {
         for (var i = 0; i < this.grid.length; i++) {
             for (var j = 0; j < this.grid[i].length; j++) {
-                if (this.grid[i][j].charAt(0) === "#") {
+                if (this.grid[i][j] !== "0") {
                     ctx.fillStyle = this.grid[i][j];
                     ctx.fillRect(i * gridSize, j * gridSize, gridSize, gridSize);
                 }
@@ -124,46 +124,19 @@ class Playfield {
 
     canMove(piece, pos) {
         for (var i = 0; i < piece.length; i++) {
-            if (piece[i].x + pos.x < 0 || piece[i].x + pos.x > canv.width / gridSize - 1) {
-                return false;
-            }
-        }
-        return true;
-    }
+            var xp = piece[i].x + pos.x;
+            var yp = piece[i].y + pos.y;
 
-    canMoveDown(piece, pos) {
-        for (var i = 0; i < piece.length; i++) {
-            if (piece[i].y + pos.y > canv.height / gridSize - 2) {
+            if (xp < 0 || xp >= 10) {
                 return false;
             }
-            if (piece[i].x + pos.x >= 0 && piece[i].y + pos.y >= -1) {
-                if (this.grid[piece[i].x + pos.x][piece[i].y + pos.y + 1].charAt(0) === "#") {
+            if (yp >= 20) {
+                return false;
+            }
+            if (yp >= 0) {
+                if (this.grid[xp][yp] !== "0") {
                     return false;
                 }
-            }
-        }
-        return true;
-    }
-
-    canMoveRight(piece, pos) {
-        for (var i = 0; i < piece.length; i++) {
-            if (piece[i].x + pos.x >= canv.width / gridSize - 1) {
-                return false;
-            }
-            if (this.grid[piece[i].x + pos.x + 1][piece[i].y + pos.y].charAt(0) === "#") {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    canMoveLeft(piece, pos) {
-        for (var i = 0; i < piece.length; i++) {
-            if (piece[i].x + pos.x <= 0) {
-                return false;
-            }
-            if (this.grid[piece[i].x + pos.x - 1][piece[i].y + pos.y].charAt(0) === "#") {
-                return false;
             }
         }
         return true;
@@ -173,13 +146,13 @@ class Playfield {
 /* Class for the falling block */
 class Tetromino {
     constructor() {
+        this.nextType = rand(0, 7);
+        this.nextPiece = blocks[this.nextType][0];
         this.reset();
     }
 
     update() {
-        if (playfield.canMoveDown(this.piece, this.pos)) {
-            this.pos.y++;
-        } else {
+        if (!this.move(new Vec2(0, 1))) {
             for (var i = 0; i < this.piece.length; i++) {
                 playfield.append(new Vec2(this.piece[i].x + this.pos.x, this.piece[i].y + this.pos.y), colors[this.type]);
             }
@@ -188,53 +161,63 @@ class Tetromino {
     }
 
     draw() {
-        if (this.pos.y >= 0) {
-            ctx.fillStyle = colors[this.type];
-            for (var i = 0; i < this.piece.length; i++) {
+        ctx.fillStyle = colors[this.type];
+        for (var i = 0; i < this.piece.length; i++) {
+            if (this.piece[i].y + this.pos.y >= 0) {
                 ctx.fillRect((this.pos.x + this.piece[i].x) * gridSize, (this.pos.y + this.piece[i].y) * gridSize, gridSize, gridSize);
             }
         }
     }
 
-    right() {
-        if (playfield.canMoveRight(this.piece, this.pos)) {
-            this.pos.x++;
+    drawNext() {
+        sdp.fillStyle = colors[this.nextType];
+        for (var i = 0; i < this.nextPiece.length; i++) {
+            sdp.fillRect((this.nextPiece[i].x + 2) * gridSize - 20, (this.nextPiece[i].y + 2) * gridSize + 20, gridSize, gridSize);
         }
     }
 
-    left() {
-        if (playfield.canMoveLeft(this.piece, this.pos)) {
-            this.pos.x--;
+    move(vec) {
+        var newPiece = [];
+        
+        for (var i = 0; i < this.piece.length; i++) {
+            newPiece.push(new Vec2(this.piece[i].x + vec.x, this.piece[i].y + vec.y));
         }
+
+        if (playfield.canMove(newPiece, this.pos)) {
+            this.pos.x += vec.x;
+            this.pos.y += vec.y;
+            return true;
+        }
+        return false;
     }
 
     rotate() {
-        // Don't rotate squares
         if (this.type === 1) {
             return;
         }
 
-        // Array to store the possible new block
-        var nPiece = [];
+        var newPiece = [];
         
         for (var i = 0; i < this.piece.length; i++) {
-            nPiece.push(new Vec2(this.piece[i].y * -1, this.piece[i].x));
+            newPiece.push(new Vec2((this.piece[i].y * -1), this.piece[i].x));
         }
 
-        if (playfield.canMove(nPiece, this.pos)) {
-            this.piece = nPiece;
+        if (playfield.canMove(newPiece, new Vec2(this.pos.x, this.pos.y))) {
+            this.piece = newPiece;
         }
     }
 
     drop() {
-        while (playfield.canMoveDown(this.piece, this.pos)) {
-            this.pos.y++;
+        while (this.move(new Vec2(0, 1))) {
+
         }
     }
 
     reset() {
-        this.type = rand(0, 7);
-        this.piece = blocks[this.type][0];
+        this.type = this.nextType;
+        this.piece = this.nextPiece;
+        this.nextType = rand(0, 7);
+        this.nextPiece = blocks[this.nextType][0];
         this.pos = new Vec2(rand(blocks[this.type][1], blocks[this.type][2]), -2);
     }
 }
@@ -243,9 +226,9 @@ class Tetromino {
 /* The hearth of the game */
 function mainLoop() {
     background.draw();
-    scr.fillStyle = "#008FFF";
-    scr.font = "30px Roboto";
-    scr.fillText(score, 10, 30);
+    sdp.fillStyle = "#008FFF";
+    sdp.font = "30px Roboto";
+    sdp.fillText(score, 10, 30);
     if (a === 0) {
         active.update();
         playfield.update();
@@ -253,6 +236,7 @@ function mainLoop() {
     }
     a--;
     active.draw();
+    active.drawNext();
     playfield.draw();
 }
 
@@ -265,15 +249,19 @@ function rand(min, max) {
 function keyPush(evt) {
     switch(evt.keyCode) {
         case 37:        // Left Arrow
-            active.left();
+        case 65:        // A
+            active.move(new Vec2(-1, 0));
             break;
         case 38:        // Up Arrow
+        case 87:        // W
             active.rotate()
             break;
         case 39:        // Right Arrow
-            active.right();
+        case 68:        // D
+            active.move(new Vec2(1, 0));
             break;
         case 40:        // Down Arrow
+        case 83:        // S
             active.drop();
             break;
         case 82:        // R
@@ -286,12 +274,12 @@ function keyPush(evt) {
 /* Templates for all possible tetrominos */
 var blocks = [
     [[new Vec2(-1, 0), new Vec2( 0, 0), new Vec2( 1, 0), new Vec2(2, 0)], 1, 7],    // I (Final)
-    [[new Vec2(-1, 0), new Vec2( 0, 0), new Vec2(-1, 1), new Vec2(0, 1)], 1, 9],    // O
-    [[new Vec2( 0, 0), new Vec2(-1, 1), new Vec2( 0, 1), new Vec2(1, 1)], 1, 9],    // T
-    [[new Vec2( 0, 0), new Vec2( 1, 0), new Vec2(-1, 1), new Vec2(0, 1)], 1, 9],    // S
-    [[new Vec2(-1, 0), new Vec2( 0, 0), new Vec2( 0, 1), new Vec2(1, 1)], 1, 9],    // Z
-    [[new Vec2(-1, 0), new Vec2(-1, 1), new Vec2( 0, 1), new Vec2(1, 1)], 1, 9],    // J
-    [[new Vec2( 1, 0), new Vec2(-1, 1), new Vec2( 0, 1), new Vec2(1, 1)], 1, 9]     // L
+    [[new Vec2(-1, -1), new Vec2( 0, -1), new Vec2(-1, 0), new Vec2(0, 0)], 1, 9],    // O
+    [[new Vec2( 0, -1), new Vec2(-1, 0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],    // T
+    [[new Vec2( 0, -1), new Vec2( 1, -1), new Vec2(-1, 0), new Vec2(0, 0)], 1, 9],    // S
+    [[new Vec2(-1, -1), new Vec2( 0, -1), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],    // Z
+    [[new Vec2(-1, -1), new Vec2(-1, 0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],    // J
+    [[new Vec2( 1, -1), new Vec2(-1, 0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9]     // L
 ];
 
 
@@ -299,6 +287,10 @@ var blocks = [
 var background = new Background(bgColor);
 var playfield = new Playfield();
 var active = new Tetromino();
+
+var width = canv.width / gridSize;
+var height = canv.height / gridSize;
+
 var score = 0;
 var a = 0; 
 setInterval(mainLoop, 1000/60);

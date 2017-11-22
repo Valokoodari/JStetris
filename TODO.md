@@ -1,11 +1,9 @@
 # To Do
-- [ ] The Game Itself (I guess...)
-- [ ] Only One CanMove() Function
-
-# In the Future
+- [x] The Game Itself (I guess...)
+- [x] Only One CanMove() Function
 - [ ] Background Images
 - [ ] Increasing Speed
-- [ ] Next Piece Display
-- [ ] Scoring System
+- [x] Next Piece Display
+- [x] Scoring System
 - [ ] Piece Holding System?
 - [ ] Option to play with pentominoes
