@@ -1,6 +1,8 @@
 /* Global canvas, context, and time */
 var canv = document.getElementById("tetrisCanvas");
 var ctx = canv.getContext("2d");
+var sCanv = document.getElementById("scoreCanvas");
+var scr = sCanv.getContext("2d");
 //var d = new Date();
 
 /* Start keyboard event listener */
@@ -13,15 +15,17 @@ var speed = 8;             // Default 8
 
 /* Color palette for tetrominos */
 var colors = [
-    "#008FFF",  // I
-    "#8FFF00",  // O
-    "#FF008F",  // T
+    "#0064B3",  // I
+    "#0072CC",  // O
+    "#0081E6",  // T
     "#008FFF",  // S
-    "#8FFF00",  // Z
-    "#FF008F",  // J
-    "#008FFF"   // L
+    "#1A9AFF",  // Z
+    "#33A5FF",  // J
+    "#4DB1FF"   // L
 ];
 
+/* List of scoring */
+var scores = [40, 100, 300, 1200];
 
 /* Simple 2D vector class (for now) */
 class Vec2 {
@@ -40,6 +44,8 @@ class Background {
     draw() {
         ctx.fillStyle = this.color;
         ctx.fillRect(0, 0, canv.width, canv.height);
+        scr.fillStyle = this.color;
+        scr.fillRect(0, 0, canv.width, canv.height);
     }
 }
 
@@ -55,22 +61,33 @@ class Playfield {
     }
 
     update() {
-        var row = this.scan();
-        for (var i = 0; i < row.length; i++) {
-            if (row[i] === 10) {
+        var rows = this.scan();
+        for (var i = 0; i < rows.length; i++) {
+            if (rows[i] === 10) {
                 for (var j = 0; j < this.grid.length; j++) {
                     this.grid[j][i] = "0";
                 }
             }
         }
-        row = this.scan();
-        for (var i = this.grid[0].length; i > 0; i--) {
-            if (row[i] === 0) {
-                for (var j = 0; j < this.grid.length; j++) {
-                    this.grid[j][i] = this.grid[j][i - 1];
-                    this.grid[j][i - 1] = "0";
+        var dest = -1;
+        var cont = 0;
+        rows = this.scan();
+        for (var i = 0; i < this.grid[0].length; i++) {
+            if (rows[i] > 0) {
+                cont++;
+            }
+            if (rows[i] === 0 && cont > 0) {
+                dest++;
+                for (var j = i; j > 0; j--) {
+                    for (var k = 0; k < this.grid.length; k++) {
+                        this.grid[k][j] = this.grid[k][j - 1];
+                        this.grid[k][j - 1] = "0";
+                    }
                 }
             }
+        }
+        if (dest >= 0) {
+            score += scores[dest];
         }
     }
 
@@ -226,8 +243,9 @@ class Tetromino {
 /* The hearth of the game */
 function mainLoop() {
     background.draw();
-    ctx.fillStyle = "#008FFF";
-    ctx.fillText(a, 10, 10);
+    scr.fillStyle = "#008FFF";
+    scr.font = "30px Roboto";
+    scr.fillText(score, 10, 30);
     if (a === 0) {
         active.update();
         playfield.update();
@@ -281,5 +299,6 @@ var blocks = [
 var background = new Background(bgColor);
 var playfield = new Playfield();
 var active = new Tetromino();
+var score = 0;
 var a = 0; 
 setInterval(mainLoop, 1000/60);
