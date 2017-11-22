@@ -11,17 +11,17 @@ document.addEventListener("keydown", keyPush);
 /* Basic settings */
 var bgColor = "#2D2D2D";    // Default #2D2D2D
 var gridSize = 40;          // Default 40
-var speed = 8;              // Default 8
+var speed = 12;              // Default 12
 
 /* Color palette for tetrominos */
 var colors = [
-    "#0064B3",  // I
-    "#0072CC",  // O
-    "#0081E6",  // T
-    "#008FFF",  // S
-    "#1A9AFF",  // Z
-    "#33A5FF",  // J
-    "#4DB1FF"   // L
+    "#54C7FC",  // I
+    "#FFCD00",  // O
+    "#FF9600",  // T
+    "#FF2851",  // S
+    "#0076FF",  // Z
+    "#44DB5E",  // J
+    "#FF3824"   // L
 ];
 
 /* List of scoring */
@@ -245,6 +245,16 @@ function mainLoop() {
     playfield.draw();
 }
 
+function clear() {
+    playfield = new Playfield();
+    active = new Tetromino();
+
+    score = 0;
+    lines = 0;
+    level = 1;
+    a = 0;
+}
+
 /* Function to create random? positive integers */
 function rand(min, max) {
     return min + Math.floor(Math.random() * (max - min));
@@ -270,7 +280,7 @@ function keyPush(evt) {
             active.drop();
             break;
         case 82:        // R
-            // restart
+            clear();
             break;
     }
 }
