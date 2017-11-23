@@ -10,6 +10,16 @@
             <div width="620" align="center">
                 <canvas id="tetrisCanvas" width="400" height="800" style="display: inline-block; vertical-align: top"></canvas>
                 <canvas id="sideCanvas" width="200" height="800" style="display: inline-block; vertical-align: top"></canvas>
+                <div>
+                    <button onclick="paused = true" style="padding: 15px 32px;">Pause</button> 
+                    <button onclick="active.rotate()" style="padding: 15px 30px;">Rotate</button> 
+                    <button onclick="reset()" style="padding: 15px 32px;">Reset</button>
+                </div>
+                <div>
+                    <button onclick="active.move(new Vec2(-1, 0))" style="padding: 15px 38px;">Left</button> 
+                    <button onclick="active.drop()" style="padding: 15px 35px;">Drop</button> 
+                    <button onclick="active.move(new Vec2(1, 0))" style="padding: 15px 33px;">Right</button>
+                </div> 
                 <div width="200">
                     <p>Left or A - Move left</p>
                     <p>Right or D - Move right</p>

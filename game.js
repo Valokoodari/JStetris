@@ -246,7 +246,7 @@ function keyPush(evt) {
                 break;
             case 38:        // Up Arrow
             case 87:        // W
-                active.rotate()
+                active.rotate();
                 break;
             case 39:        // Right Arrow
             case 68:        // D
