@@ -35,7 +35,7 @@ class Vec2 {
     }
 }
 
-/* Background class to maybe implement backgroung images */
+/* Background class to maybe implement backgroung images someday */
 class Background {
     constructor(color) {
         this.color = color;
@@ -49,6 +49,7 @@ class Background {
     }
 }
 
+/* Class for storing frozen blocks and checking if movements are possible */
 class Playfield {
     constructor() {
         this.grid = new Array(10);
@@ -60,6 +61,7 @@ class Playfield {
         }
     }
 
+    /* Destroys all full rows and moves floating rows down */
     update() {
         var rows = this.scan();
         for (var i = 0; i < rows.length; i++) {
@@ -89,29 +91,31 @@ class Playfield {
         if (dest > 0) {
             score += level * scores[dest - 1];
             lines += dest;
-            if (lines > 8) {
+            if (lines >= 8) {
                 level++;
                 lines -= 8;
             }
         }
     }
 
+    /* Function that return the amount of blocks on each row */
     scan() {
-        var row = new Array(this.grid[0].length);
-        for (var i = 0; i < row.length; i++) {
-            row[i] = 0;
+        var rows = new Array(this.grid[0].length);
+        for (var i = 0; i < rows.length; i++) {
+            rows[i] = 0;
         }
         for (var i = 0; i < this.grid.length; i++) {
             for (var j = 0; j < this.grid[i].length; j++) {
                 if (this.grid[i][j] !== "0") {
-                    row[j]++;
+                    rows[j]++;
                 }
             }
         }
 
-        return row;
+        return rows;
     }
 
+    /* Draws all of the blocks in the playfield */
     draw() {
         for (var i = 0; i < this.grid.length; i++) {
             for (var j = 0; j < this.grid[i].length; j++) {
@@ -123,6 +127,7 @@ class Playfield {
         }
     }
 
+    /* Adds the block to the grid with it's color */
     append(block, color) {
         if (block.y < 0) {
             dead = true;
@@ -131,6 +136,7 @@ class Playfield {
         this.grid[block.x][block.y] = color;
     }
 
+    /* Check if the piece can move to it's new position */
     canMove(piece, pos) {
         for (var i = 0; i < piece.length; i++) {
             var xp = piece[i].x + pos.x;
@@ -157,44 +163,44 @@ class Tetromino {
     constructor() {
         this.nextType = rand(0, 7);
         this.nextPiece = blocks[this.nextType][0];
-        this.reset();
+        this.next();
     }
 
+    /* Moves the piece down by one row and checks if the piece can still move */
     update() {
         if (!this.move(new Vec2(0, 1))) {
             for (var i = 0; i < this.piece.length; i++) {
                 playfield.append(new Vec2(this.piece[i].x + this.pos.x, this.piece[i].y + this.pos.y), colors[this.type]);
             }
-            this.reset();
+            this.next();
         }
     }
 
+    /* Draws the current piece to the main canvas and the next piece to the secondary canvas */
     draw() {
+        // Current piece
         ctx.fillStyle = colors[this.type];
         for (var i = 0; i < this.piece.length; i++) {
             if (this.piece[i].y + this.pos.y >= 0) {
                 ctx.fillRect((this.pos.x + this.piece[i].x) * gridSize, (this.pos.y + this.piece[i].y) * gridSize, gridSize, gridSize);
             }
         }
-    }
-
-    drawNext() {
+        // Next piece
         sdp.fillStyle = colors[this.nextType];
         for (var i = 0; i < this.nextPiece.length; i++) {
             sdp.fillRect((this.nextPiece[i].x + 2) * gridSize - 20, (this.nextPiece[i].y + 2) * gridSize + 20, gridSize, gridSize);
         }
     }
 
+    /* Moves the piece according to the provided 2D vector */
     move(vec) {
-        if (paused) {
-            return;
-        }
         var newPiece = [];
         
         for (var i = 0; i < this.piece.length; i++) {
             newPiece.push(new Vec2(this.piece[i].x + vec.x, this.piece[i].y + vec.y));
         }
 
+        // Moves the piece if its new location is possible
         if (playfield.canMove(newPiece, this.pos)) {
             this.pos.x += vec.x;
             this.pos.y += vec.y;
@@ -203,8 +209,9 @@ class Tetromino {
         return false;
     }
 
+    /* Rotates the current falling piece */
     rotate() {
-        if (this.type === 1 || paused) {
+        if (this.type === 1) {
             return;
         }
 
@@ -214,6 +221,7 @@ class Tetromino {
             newPiece.push(new Vec2((this.piece[i].y * -1), this.piece[i].x));
         }
 
+        // Set the piece to the rotated state if it's possible
         if (playfield.canMove(newPiece, new Vec2(this.pos.x, this.pos.y))) {
             this.piece = newPiece;
         }
@@ -225,7 +233,8 @@ class Tetromino {
         }
     }
 
-    reset() {
+    /* Creates the next piece and set the previous one as the current piece */
+    next() {
         this.type = this.nextType;
         this.piece = this.nextPiece;
         this.nextType = rand(0, 7);
@@ -249,13 +258,13 @@ function mainLoop() {
         }
         a--;
         active.draw();
-        active.drawNext();
-        playfield.draw();
-    } else if (!dead) {
+        playfield.draw(); 
+    } else if (!dead) { // Prints "Paused" to the top left corner if the game is paused
         ctx.fillStyle = "#008FFF";
         ctx.font = "30px Roboto";
         ctx.fillText("Paused.", 10, 30);
-    } else {
+    } else {            // Prints "Game Over" if the game has been lost
+        paused = false;
         ctx.fillStyle = "#000000";
         ctx.fillRect(70, 335, 260, 150);
         ctx.fillStyle = "#FF0000";
@@ -266,14 +275,7 @@ function mainLoop() {
     }
 }
 
-function pause() {
-    if (paused) {
-        paused = false;
-    } else {
-        paused = true;
-    }
-}
-
+/* Restart the game by resetting everything */
 function reset() {
     playfield = new Playfield();
     active = new Tetromino();
@@ -295,30 +297,38 @@ function keyPush(evt) {
     if([32, 37, 38, 39, 40].indexOf(evt.keyCode) > -1) {
         evt.preventDefault();
     }
-    switch(evt.keyCode) {
-        case 37:        // Left Arrow
-        case 65:        // A
-            active.move(new Vec2(-1, 0));
-            break;
-        case 38:        // Up Arrow
-        case 87:        // W
-            active.rotate()
-            break;
-        case 39:        // Right Arrow
-        case 68:        // D
-            active.move(new Vec2(1, 0));
-            break;
-        case 40:        // Down Arrow
-        case 83:        // S
-            active.drop();
-            break;
-        case 82:        // R
-            reset();
-            break;
-        case 27:        // ESC
-            pause();
-            break;
-    }
+    if (!paused) {
+        switch(evt.keyCode) {
+            case 37:        // Left Arrow
+            case 65:        // A
+                active.move(new Vec2(-1, 0));
+                break;
+            case 38:        // Up Arrow
+            case 87:        // W
+                active.rotate()
+                break;
+            case 39:        // Right Arrow
+            case 68:        // D
+                active.move(new Vec2(1, 0));
+                break;
+            case 40:        // Down Arrow
+            case 83:        // S
+                active.drop();
+                break;
+            case 82:        // R
+                reset();
+                break;
+            case 27:        // ESC
+                paused = true;
+                break;
+        }
+    } else {
+        switch(evt.keyCode) {
+            case 27:        // ESC
+                paused = false;
+                break;
+        }
+    }   
 }
 
 
@@ -338,9 +348,6 @@ var blocks = [
 var background = new Background(bgColor);
 var playfield = new Playfield();
 var active = new Tetromino();
-
-var width = canv.width / gridSize;
-var height = canv.height / gridSize;
 
 var score = 0;
 var lines = 0;
