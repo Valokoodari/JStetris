@@ -11,7 +11,9 @@ document.addEventListener("keydown", keyPush);
 /* Basic settings */
 var bgColor = "#2D2D2D";    // Default #2D2D2D
 var gridSize = 40;          // Default 40
+var maxLevel = 10;          // Default 10
 var speed = 60;             // Default 60
+var divisor = 1.2;          // Default 1.2
 var show = 3;               // Default 3 : Max 6
 
 /* Color palette for tetrominos */
@@ -94,10 +96,9 @@ class Playfield {
         if (dest > 0) {
             score += level * scores[dest - 1];
             lines += dest;
-            if (lines >= 8) {
+            if (lines - level * 8 >= 0 && level < maxLevel) {
                 level++;
-                speed = Math.floor(speed / 2);
-                lines -= 8;
+                speed = Math.floor(speed / divisor);
             }
         }
         this.draw();

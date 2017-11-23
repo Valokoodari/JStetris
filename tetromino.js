@@ -53,8 +53,7 @@ class Tetromino {
 
         // Moves the piece if its new location is possible
         if (playfield.canMove(newPiece, this.pos)) {
-            this.pos.x += vec.x;
-            this.pos.y += vec.y;
+            this.pos.sum(vec);
             return true;
         }
         return false;
