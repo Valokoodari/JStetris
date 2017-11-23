@@ -28,13 +28,15 @@ var colors = [
 /* List of scoring */
 var scores = [40, 100, 300, 1200];
 
-/* Simple 2D vector class (for now) */
-class Vec2 {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-}
+var pieces = [
+    [[new Vec2(-1,  0), new Vec2( 0,  0), new Vec2( 1, 0), new Vec2(2, 0)], 1, 7],  // I
+    [[new Vec2(-1, -1), new Vec2( 0, -1), new Vec2(-1, 0), new Vec2(0, 0)], 1, 9],  // O
+    [[new Vec2( 0, -1), new Vec2(-1,  0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],  // T
+    [[new Vec2( 0, -1), new Vec2( 1, -1), new Vec2(-1, 0), new Vec2(0, 0)], 1, 9],  // S
+    [[new Vec2(-1, -1), new Vec2( 0, -1), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],  // Z
+    [[new Vec2(-1, -1), new Vec2(-1,  0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],  // J
+    [[new Vec2( 1, -1), new Vec2(-1,  0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9]   // L
+];
 
 /* Background class to maybe implement backgroung images someday */
 class Background {
@@ -161,99 +163,6 @@ class Playfield {
     }
 }
 
-/* Class for the falling block */
-class Tetromino {
-    constructor() {
-        this.nextTypes = [];
-        this.nextPieces = [];
-
-        for (var i = 0; i < show; i++) {
-            this.nextTypes.push(rand(0, 7));
-            this.nextPieces.push(pieces[this.nextTypes[i]][0]);
-        }
-        this.next();
-    }
-
-    /* Moves the piece down by one row and checks if the piece can still move */
-    update() {
-        if (!this.move(new Vec2(0, 1))) {
-            for (var i = 0; i < this.piece.length; i++) {
-                playfield.append(new Vec2(this.piece[i].x + this.pos.x, this.piece[i].y + this.pos.y), colors[this.type]);
-            }
-            this.next();
-        }
-    }
-
-    /* Draws the current piece to the main canvas and the next piece to the secondary canvas */
-    draw() {
-        // Current piece
-        ctx.fillStyle = colors[this.type];
-        for (var i = 0; i < this.piece.length; i++) {
-            if (this.piece[i].y + this.pos.y >= 0) {
-                ctx.fillRect((this.pos.x + this.piece[i].x) * gridSize, (this.pos.y + this.piece[i].y) * gridSize, gridSize, gridSize);
-            }
-        }
-        // Future pieces
-        for (var i = 0; i < show; i++) {
-            sdp.fillStyle = colors[this.nextTypes[i]];
-            for (var j = 0; j < this.nextPieces[i].length; j++) {
-                sdp.fillRect((this.nextPieces[i][j].x + 2) * gridSize - 20, (this.nextPieces[i][j].y + 2) * gridSize + 20 + 3 * i * gridSize, gridSize, gridSize);
-            }
-        }
-    }
-
-    /* Moves the piece according to the provided 2D vector */
-    move(vec) {
-        var newPiece = [];
-        
-        for (var i = 0; i < this.piece.length; i++) {
-            newPiece.push(new Vec2(this.piece[i].x + vec.x, this.piece[i].y + vec.y));
-        }
-
-        // Moves the piece if its new location is possible
-        if (playfield.canMove(newPiece, this.pos)) {
-            this.pos.x += vec.x;
-            this.pos.y += vec.y;
-            return true;
-        }
-        return false;
-    }
-
-    /* Rotates the current falling piece */
-    rotate() {
-        if (this.type === 1) {
-            return;
-        }
-
-        var newPiece = [];
-        
-        for (var i = 0; i < this.piece.length; i++) {
-            newPiece.push(new Vec2((this.piece[i].y * -1), this.piece[i].x));
-        }
-
-        // Set the piece to the rotated state if it's possible
-        if (playfield.canMove(newPiece, new Vec2(this.pos.x, this.pos.y))) {
-            this.piece = newPiece;
-        }
-    }
-
-    drop() {
-        while (this.move(new Vec2(0, 1)) && !paused) {
-
-        }
-    }
-
-    /* Creates the next piece and set the previous one as the current piece */
-    next() {
-        this.type = this.nextTypes.shift();
-        this.piece = this.nextPieces.shift();
-        this.nextTypes.push(rand(0, 7));
-        this.nextPieces.push(pieces[this.nextTypes[show - 1]][0]);
-        this.pos = new Vec2(rand(pieces[this.type][1], pieces[this.type][2]), -2);
-    }
-}
-
-
 /* The hearth of the game */
 function mainLoop() {
     if (!paused && !dead) {
@@ -266,7 +175,8 @@ function mainLoop() {
             a = speed;
         }
         a--;
-        active.draw();
+        drawBlocks(active.getPiece(), active.getType());
+        drawFuture(active.getFuturePieces());
         playfield.update();
     } else if (!dead) { // Prints "Paused" to the top left corner if the game is paused
         ctx.fillStyle = "#008FFF";
@@ -284,10 +194,31 @@ function mainLoop() {
     }
 }
 
+function drawBlocks(blocks, color) {
+    ctx.fillStyle = colors[color];
+    for (var i = 0; i < blocks.length; i++) {
+        if (blocks[i].x >= 0 && blocks[i].x <= 10 && blocks[i].y >= 0 && blocks[i].y <= 20) {
+            ctx.fillRect(blocks[i].x * gridSize, blocks[i].y * gridSize, gridSize, gridSize);
+        }
+    }
+}
+
+function drawFuture(future) {
+    for (var i = 0; i < future.length; i++) {
+        var piece = pieces[future[i]][0];
+
+        sdp.fillStyle = colors[future[i]];
+
+        for (var j = 0; j < piece.length; j++) {
+            sdp.fillRect((piece[j].x + 2) * gridSize - 20, (piece[j].y + 2) * gridSize + 20 + 3 * i * gridSize , gridSize, gridSize);
+        }
+    }
+}
+
 /* Restart the game by resetting everything */
 function reset() {
     playfield = new Playfield();
-    active = new Tetromino();
+    active = new Tetromino(pieces, colors);
 
     score = 0;
     lines = 0;
@@ -340,23 +271,10 @@ function keyPush(evt) {
     }   
 }
 
-
-/* Templates for all possible tetrominos */
-var pieces = [
-    [[new Vec2(-1,  0), new Vec2( 0,  0), new Vec2( 1, 0), new Vec2(2, 0)], 1, 7],  // I
-    [[new Vec2(-1, -1), new Vec2( 0, -1), new Vec2(-1, 0), new Vec2(0, 0)], 1, 9],  // O
-    [[new Vec2( 0, -1), new Vec2(-1,  0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],  // T
-    [[new Vec2( 0, -1), new Vec2( 1, -1), new Vec2(-1, 0), new Vec2(0, 0)], 1, 9],  // S
-    [[new Vec2(-1, -1), new Vec2( 0, -1), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],  // Z
-    [[new Vec2(-1, -1), new Vec2(-1,  0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],  // J
-    [[new Vec2( 1, -1), new Vec2(-1,  0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9]   // L
-];
-
-
 /* Finally starting the game */
 var background = new Background(bgColor);
 var playfield = new Playfield();
-var active = new Tetromino();
+var active = new Tetromino(pieces, colors);
 
 var score = 0;
 var lines = 0;
