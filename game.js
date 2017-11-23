@@ -124,6 +124,10 @@ class Playfield {
     }
 
     append(block, color) {
+        if (block.y < 0) {
+            dead = true;
+            return;
+        }
         this.grid[block.x][block.y] = color;
     }
 
@@ -230,7 +234,7 @@ class Tetromino {
 
 /* The hearth of the game */
 function mainLoop() {
-    if (!paused) {
+    if (!paused && !dead) {
         background.draw();
         sdp.fillStyle = "#008FFF";
         sdp.font = "30px Roboto";
@@ -244,10 +248,18 @@ function mainLoop() {
         active.draw();
         active.drawNext();
         playfield.draw();
-    } else {
+    } else if (!dead) {
         ctx.fillStyle = "#008FFF";
         ctx.font = "30px Roboto";
         ctx.fillText("Paused.", 10, 30);
+    } else {
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(70, 335, 260, 150);
+        ctx.fillStyle = "#FF0000";
+        ctx.font = "50px Roboto";
+        ctx.fillText("Game Over", 90, 400);
+        ctx.font = "30px Roboto";
+        ctx.fillText("Press R to Restart", 92, 450);
     }
 }
 
@@ -259,13 +271,14 @@ function pause() {
     }
 }
 
-function clear() {
+function reset() {
     playfield = new Playfield();
     active = new Tetromino();
 
     score = 0;
     lines = 0;
     level = 1;
+    dead = false;
     a = 0;
 }
 
@@ -297,7 +310,7 @@ function keyPush(evt) {
             active.drop();
             break;
         case 82:        // R
-            clear();
+            reset();
             break;
         case 27:        // ESC
             pause();
@@ -331,4 +344,5 @@ var lines = 0;
 var level = 1;
 var a = 0;
 var paused = false;
+var dead = false;
 setInterval(mainLoop, 1000/60);
