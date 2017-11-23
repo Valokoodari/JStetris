@@ -5,16 +5,20 @@
         <title>Valokoodari - Tetris</title>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Condensed">
     </head>
-    <body style="background: #202020; color: #FFFFFF; font: 'Roboto', sans-serif">
+    <body style="background: #202020; color: #FFFFFF; font-family: 'Roboto', sans-serif">
         <div style="width: 100%; text-align: center;">
-            <canvas id="tetrisCanvas" width="400" height="800" style="display: inline;"></canvas>
-            <canvas id="sideCanvas" width="200" height="160" style="display: inline"></canvas>
-            <p>Left or A - Move left</p>
-            <p>Right or D - Move right</p>
-            <p>Down or S - Hard Drop</p>
-            <p>Up or W - Rotate</p>
-            <p>Esc - Pause</p>
-            <p>R - Reset</p>
+            <div width="620" align="center">
+                <canvas id="tetrisCanvas" width="400" height="800" style="display: inline-block; vertical-align: top"></canvas>
+                <canvas id="sideCanvas" width="200" height="160" style="display: inline-block; vertical-align: top"></canvas>
+                <div width="200">
+                    <p>Left or A - Move left</p>
+                    <p>Right or D - Move right</p>
+                    <p>Down or S - Hard Drop</p>
+                    <p>Up or W - Rotate</p>
+                    <p>Esc - Pause</p>
+                    <p>R - Reset</p>
+                <div>
+            </div>
         </div>
         <script src="game.js"></script>
     </body>

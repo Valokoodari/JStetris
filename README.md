@@ -6,9 +6,9 @@ should have done, I now think that JavaScript is definitely something I want to 
 more in the projects I do.
 
 # Controls
-Left or A - Move left
-Right or D - Move right
-Down or S - Hard Drop
-Up or W - Rotate
-Esc - Pause
-R - Reset
+* Left or A - Move left
+* Right or D - Move right
+* Down or S - Hard Drop
+* Up or W - Rotate
+* Esc - Pause
+* R - Reset
