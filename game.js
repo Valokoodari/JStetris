@@ -11,7 +11,8 @@ document.addEventListener("keydown", keyPush);
 /* Basic settings */
 var bgColor = "#2D2D2D";    // Default #2D2D2D
 var gridSize = 40;          // Default 40
-var speed = 12;              // Default 12
+var speed = 60;             // Default 60
+var show = 3;               // Default 3 : Max 6
 
 /* Color palette for tetrominos */
 var colors = [
@@ -93,9 +94,11 @@ class Playfield {
             lines += dest;
             if (lines >= 8) {
                 level++;
+                speed = Math.floor(speed / 2);
                 lines -= 8;
             }
         }
+        this.draw();
     }
 
     /* Function that return the amount of blocks on each row */
@@ -161,8 +164,13 @@ class Playfield {
 /* Class for the falling block */
 class Tetromino {
     constructor() {
-        this.nextType = rand(0, 7);
-        this.nextPiece = blocks[this.nextType][0];
+        this.nextTypes = [];
+        this.nextPieces = [];
+
+        for (var i = 0; i < show; i++) {
+            this.nextTypes.push(rand(0, 7));
+            this.nextPieces.push(pieces[this.nextTypes[i]][0]);
+        }
         this.next();
     }
 
@@ -185,10 +193,12 @@ class Tetromino {
                 ctx.fillRect((this.pos.x + this.piece[i].x) * gridSize, (this.pos.y + this.piece[i].y) * gridSize, gridSize, gridSize);
             }
         }
-        // Next piece
-        sdp.fillStyle = colors[this.nextType];
-        for (var i = 0; i < this.nextPiece.length; i++) {
-            sdp.fillRect((this.nextPiece[i].x + 2) * gridSize - 20, (this.nextPiece[i].y + 2) * gridSize + 20, gridSize, gridSize);
+        // Future pieces
+        for (var i = 0; i < show; i++) {
+            sdp.fillStyle = colors[this.nextTypes[i]];
+            for (var j = 0; j < this.nextPieces[i].length; j++) {
+                sdp.fillRect((this.nextPieces[i][j].x + 2) * gridSize - 20, (this.nextPieces[i][j].y + 2) * gridSize + 20 + 3 * i * gridSize, gridSize, gridSize);
+            }
         }
     }
 
@@ -235,11 +245,11 @@ class Tetromino {
 
     /* Creates the next piece and set the previous one as the current piece */
     next() {
-        this.type = this.nextType;
-        this.piece = this.nextPiece;
-        this.nextType = rand(0, 7);
-        this.nextPiece = blocks[this.nextType][0];
-        this.pos = new Vec2(rand(blocks[this.type][1], blocks[this.type][2]), -2);
+        this.type = this.nextTypes.shift();
+        this.piece = this.nextPieces.shift();
+        this.nextTypes.push(rand(0, 7));
+        this.nextPieces.push(pieces[this.nextTypes[show - 1]][0]);
+        this.pos = new Vec2(rand(pieces[this.type][1], pieces[this.type][2]), -2);
     }
 }
 
@@ -253,12 +263,11 @@ function mainLoop() {
         sdp.fillText(score, 10, 30);
         if (a === 0) {
             active.update();
-            playfield.update();
             a = speed;
         }
         a--;
         active.draw();
-        playfield.draw(); 
+        playfield.update();
     } else if (!dead) { // Prints "Paused" to the top left corner if the game is paused
         ctx.fillStyle = "#008FFF";
         ctx.font = "30px Roboto";
@@ -333,7 +342,7 @@ function keyPush(evt) {
 
 
 /* Templates for all possible tetrominos */
-var blocks = [
+var pieces = [
     [[new Vec2(-1,  0), new Vec2( 0,  0), new Vec2( 1, 0), new Vec2(2, 0)], 1, 7],  // I
     [[new Vec2(-1, -1), new Vec2( 0, -1), new Vec2(-1, 0), new Vec2(0, 0)], 1, 9],  // O
     [[new Vec2( 0, -1), new Vec2(-1,  0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],  // T
@@ -355,4 +364,4 @@ var level = 1;
 var a = 0;
 var paused = false;
 var dead = false;
-setInterval(mainLoop, 1000/60);
+setInterval(mainLoop, 1000/120);
