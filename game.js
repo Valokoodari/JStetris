@@ -186,6 +186,9 @@ class Tetromino {
     }
 
     move(vec) {
+        if (paused) {
+            return;
+        }
         var newPiece = [];
         
         for (var i = 0; i < this.piece.length; i++) {
@@ -201,7 +204,7 @@ class Tetromino {
     }
 
     rotate() {
-        if (this.type === 1) {
+        if (this.type === 1 || paused) {
             return;
         }
 
@@ -217,7 +220,7 @@ class Tetromino {
     }
 
     drop() {
-        while (this.move(new Vec2(0, 1))) {
+        while (this.move(new Vec2(0, 1)) && !paused) {
 
         }
     }
