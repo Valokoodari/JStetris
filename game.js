@@ -228,6 +228,15 @@ function reset() {
     a = 0;
 }
 
+/* Temporary function to toggle pause on mobile devices */
+function togglePause() {
+    if (paused) {
+        paused = false;
+    } else {
+        paused = true;
+    }
+}
+
 /* Function to create random? positive integers */
 function rand(min, max) {
     return min + Math.floor(Math.random() * (max - min));
