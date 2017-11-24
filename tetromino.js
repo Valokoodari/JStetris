@@ -1,6 +1,5 @@
 class Tetromino {
-    constructor(pieces, colors) {
-        this.colors = colors;
+    constructor(pieces) {
         this.pieces = pieces;
 
         this.futurePieces = [];
@@ -15,7 +14,7 @@ class Tetromino {
     update() {
         if (!this.move(new Vec2(0, 1))) {
             for (var i = 0; i < this.piece.length; i++) {
-                playfield.append(new Vec2(this.piece[i].x + this.pos.x, this.piece[i].y + this.pos.y), colors[this.type]);
+                playfield.append(new Vec2(this.piece[i].x + this.pos.x, this.piece[i].y + this.pos.y), this.type);
             }
             this.next();
         }

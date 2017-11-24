@@ -11,14 +11,14 @@
                 <canvas id="tetrisCanvas" width="400" height="800" style="display: inline-block; vertical-align: top"></canvas>
                 <canvas id="sideCanvas" width="200" height="800" style="display: inline-block; vertical-align: top"></canvas>
                 <div>
-                    <button onclick="togglePause()" style="background: #F1F1F1; padding: 15px 32px; -webkit-appearance: none; -moz-appearance: none; -appearance: none;">Pause</button> 
-                    <button onclick="active.rotate()" style="background: #F1F1F1; padding: 15px 30px; -webkit-appearance: none; -moz-appearance: none; -appearance: none;">Rotate</button> 
-                    <button onclick="reset()" style="background: #F1F1F1; padding: 15px 32px; -webkit-appearance: none; -moz-appearance: none; -appearance: none;">Reset</button>
+                    <button onclick="action(27)" style="background: #F1F1F1; padding: 15px 32px; -webkit-appearance: none; -moz-appearance: none; -appearance: none;">Pause</button> 
+                    <button onclick="action(38)" style="background: #F1F1F1; padding: 15px 30px; -webkit-appearance: none; -moz-appearance: none; -appearance: none;">Rotate</button> 
+                    <button onclick="action(82)" style="background: #F1F1F1; padding: 15px 32px; -webkit-appearance: none; -moz-appearance: none; -appearance: none;">Reset</button>
                 </div>
                 <div>
-                    <button onclick="active.move(new Vec2(-1, 0))" style="background: #F1F1F1; padding: 15px 39px; -webkit-appearance: none; -moz-appearance: none; -appearance: none;">Left</button> 
-                    <button onclick="active.drop()" style="background: #F1F1F1; padding: 15px 35px; -webkit-appearance: none; -moz-appearance: none; -appearance: none;">Drop</button> 
-                    <button onclick="active.move(new Vec2(1, 0))" style="background: #F1F1F1; padding: 15px 33px; -webkit-appearance: none; -moz-appearance: none; -appearance: none;">Right</button>
+                    <button onclick="action(37)" style="background: #F1F1F1; padding: 15px 39px; -webkit-appearance: none; -moz-appearance: none; -appearance: none;">Left</button> 
+                    <button onclick="action(40)" style="background: #F1F1F1; padding: 15px 35px; -webkit-appearance: none; -moz-appearance: none; -appearance: none;">Drop</button> 
+                    <button onclick="action(39)" style="background: #F1F1F1; padding: 15px 33px; -webkit-appearance: none; -moz-appearance: none; -appearance: none;">Right</button>
                 </div> 
                 <div width="200">
                     <p>Left or A - Move left</p>
@@ -31,6 +31,8 @@
             </div>
         </div>
         <script src="vec2.js"></script>
+        <script src="graphics.js"></script>
+        <script src="playfield.js"></script>
         <script src="tetromino.js"></script>
         <script src="game.js"></script>
     </body>
