@@ -224,6 +224,7 @@ function reset() {
     score = 0;
     lines = 0;
     level = 1;
+    speed = 60;
     dead = false;
     a = 0;
 }
