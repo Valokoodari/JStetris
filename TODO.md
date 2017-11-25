@@ -1,8 +1,8 @@
 # To Do
 - [x] The Game Itself (I guess...)
 - [x] Only One CanMove() Function
-- [ ] Background Images?
-- [x] Increasing Speed
+- [ ] Background Images
+- [ ] Increasing Speed
 - [x] Next Piece Indicator
 - [x] Scoring System
 - [x] Levels
