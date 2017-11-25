@@ -4,7 +4,7 @@ document.addEventListener("keydown", keyPush);
 /* Basic settings */
 var maxLevel = 10;          // Default 10
 var speed = 60;             // Default 60
-var divisor = 1.2;          // Default 1.2
+var divisor = 1.1;          // Default 1.15
 var show = 3;               // Default 3 : Max 6
 
 /* List of scoring */

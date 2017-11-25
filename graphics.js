@@ -39,7 +39,9 @@ class Graphics {
     drawState() {
         this.sdp.fillStyle = "#008FFF";
         this.sdp.font = "30px Roboto";
-        this.sdp.fillText(score, 10, 30);
+        this.sdp.fillText("Score: " + score, 10, 30);
+        this.sdp.fillText("Lines: " + lines, 10, 70);
+        this.sdp.fillText("Level: " + level, 10, 110);
     }
 
     drawBlock(pos, color) {
@@ -62,7 +64,7 @@ class Graphics {
          this.sdp.fillStyle = this.colors[future[i]];
 
             for (var j = 0; j < piece.length; j++) {
-                this.sdp.fillRect((piece[j].x + 2) * this.gridSize - 20, (piece[j].y + 2) * this.gridSize + 20 + 3 * i * this.gridSize, this.gridSize, this.gridSize);
+                this.sdp.fillRect((piece[j].x + 2) * this.gridSize - 20, (piece[j].y + 4) * this.gridSize + 20 + 3 * i * this.gridSize, this.gridSize, this.gridSize);
             }
         }
     }
