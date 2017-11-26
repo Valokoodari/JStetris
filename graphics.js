@@ -57,12 +57,11 @@ class Graphics {
         }
     }
 
-    drawFuture(future) {
+    drawFuture(future, colors) {
         for (var i = 0; i < future.length; i++) {
-            var piece = pieces[future[i]][0];
-
-         this.sdp.fillStyle = this.colors[future[i]];
-
+            this.sdp.fillStyle = this.colors[colors[i]];
+            var piece = future[i][0];
+            
             for (var j = 0; j < piece.length; j++) {
                 this.sdp.fillRect((piece[j].x + 2) * this.gridSize - 20, (piece[j].y + 4) * this.gridSize + 20 + 3 * i * this.gridSize, this.gridSize, this.gridSize);
             }

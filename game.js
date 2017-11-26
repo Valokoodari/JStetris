@@ -10,16 +10,6 @@ var show = 3;               // Default 3 : Max 6
 /* List of scoring */
 var scores = [40, 100, 300, 1200];
 
-var pieces = [
-    [[new Vec2(-1,  0), new Vec2( 0,  0), new Vec2( 1, 0), new Vec2(2, 0)], 1, 7],  // I
-    [[new Vec2(-1, -1), new Vec2( 0, -1), new Vec2(-1, 0), new Vec2(0, 0)], 1, 9],  // O
-    [[new Vec2( 0, -1), new Vec2(-1,  0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],  // T
-    [[new Vec2( 0, -1), new Vec2( 1, -1), new Vec2(-1, 0), new Vec2(0, 0)], 1, 9],  // S
-    [[new Vec2(-1, -1), new Vec2( 0, -1), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],  // Z
-    [[new Vec2(-1, -1), new Vec2(-1,  0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],  // J
-    [[new Vec2( 1, -1), new Vec2(-1,  0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9]   // L
-];
-
 /* Background class to maybe implement backgroung images someday */
 class Background {
     constructor(color) {
@@ -40,7 +30,7 @@ function mainLoop() {
         }
         a--;
         graphics.drawBlocks(active.getPiece(), active.getType());
-        graphics.drawFuture(active.getFuturePieces());
+        graphics.drawFuture(active.getFuturePieces(), active.getFuturePieceTypes());
         playfield.update();
     } else if (!dead) {
         graphics.pause();
@@ -53,7 +43,7 @@ function mainLoop() {
 /* Restart the game by resetting everything */
 function reset() {
     playfield = new Playfield();
-    active = new Tetromino(pieces);
+    active = new Tetromino();
 
     score = 0;
     lines = 0;
@@ -123,7 +113,7 @@ function keyPush(evt) {
 /* Finally starting the game */
 var graphics = new Graphics();
 var playfield = new Playfield();
-var active = new Tetromino(pieces);
+var active = new Tetromino();
 
 var score = 0;
 var lines = 0;

@@ -1,6 +1,14 @@
 class Tetromino {
     constructor(pieces) {
-        this.pieces = pieces;
+        this.pieces = [
+            [[new Vec2(-1,  0), new Vec2( 0,  0), new Vec2( 1, 0), new Vec2(2, 0)], 1, 7],  // I
+            [[new Vec2(-1, -1), new Vec2( 0, -1), new Vec2(-1, 0), new Vec2(0, 0)], 1, 9],  // O
+            [[new Vec2( 0, -1), new Vec2(-1,  0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],  // T
+            [[new Vec2( 0, -1), new Vec2( 1, -1), new Vec2(-1, 0), new Vec2(0, 0)], 1, 9],  // S
+            [[new Vec2(-1, -1), new Vec2( 0, -1), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],  // Z
+            [[new Vec2(-1, -1), new Vec2(-1,  0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9],  // J
+            [[new Vec2( 1, -1), new Vec2(-1,  0), new Vec2( 0, 0), new Vec2(1, 0)], 1, 9]   // L
+        ];
 
         this.futurePieces = [];
 
@@ -35,6 +43,15 @@ class Tetromino {
     }
 
     getFuturePieces() {
+        var fPieces = [];
+
+        for (var i = 0; i < this.futurePieces.length; i++) {
+            fPieces.push(this.pieces[this.futurePieces[i]]);
+        }
+        return fPieces;
+    }
+
+    getFuturePieceTypes() {
         return this.futurePieces;
     }
 
