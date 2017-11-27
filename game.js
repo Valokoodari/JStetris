@@ -10,15 +10,6 @@ var show = 3;               // Default 3 : Max 6
 /* List of scoring */
 var scores = [40, 100, 300, 1200];
 
-/* Background class to maybe implement backgroung images someday */
-class Background {
-    constructor(color) {
-        this.color = color;
-    }
-
-    
-}
-
 /* The hearth of the game */
 function mainLoop() {
     if (!paused && !dead) {
