@@ -1,115 +1,99 @@
-/* Start keyboard event listener */
-document.addEventListener("keydown", keyPush);
+class Game {
+    constructor(scores, score, lines, level, a, speed) {
+        this.scores = scores;
 
-/* Basic settings */
-var maxLevel = 10;          // Default 10
-var speed = 60;             // Default 60
-var divisor = 1.1;          // Default 1.15
-var show = 3;               // Default 3 : Max 6
+        this.score = 0;
+        this.lines = 0;
+        this.level = 1;
 
-/* List of scoring */
-var scores = [40, 100, 300, 1200];
+        this.a = a;
+        this.speed = speed;
 
-/* The hearth of the game */
-function mainLoop() {
-    if (!paused && !dead) {
-        graphics.drawBackground();
-        graphics.drawState();
-        if (a === 0) {
-            active.update();
-            a = speed;
-        }
-        a--;
-        graphics.drawBlocks(active.getPiece(), active.getType());
-        graphics.drawFuture(active.getFuturePieces(), active.getFuturePieceTypes());
-        playfield.update();
-    } else if (!dead) {
-        graphics.pause();
-    } else {
-        paused = false;
-        graphics.gameOver();
+        this.newGame();
+        this.start();
     }
-}
 
-/* Restart the game by resetting everything */
-function reset() {
-    playfield = new Playfield();
-    active = new Tetromino();
-
-    score = 0;
-    lines = 0;
-    level = 1;
-    speed = 60;
-    dead = false;
-    a = 0;
-}
-
-/* Temporary function to toggle pause on mobile devices */
-function togglePause() {
-    if (paused) {
-        paused = false;
-    } else {
-        paused = true;
-    }
-}
-
-/* Function to create random? positive integers */
-function rand(min, max) {
-    return min + Math.floor(Math.random() * (max - min));
-}
-
-function action(n) {
-    if (!paused) {
-        switch(n) {
-            case 37:        // Left Arrow
-            case 65:        // A
-                active.move(new Vec2(-1, 0));
-                break;
-            case 38:        // Up Arrow
-            case 87:        // W
-                active.rotate();
-                break;
-            case 39:        // Right Arrow
-            case 68:        // D
-                active.move(new Vec2(1, 0));
-                break;
-            case 40:        // Down Arrow
-            case 83:        // S
-                active.drop();
-                break;
-            case 82:        // R
-                reset();
-                break;
-            case 27:        // ESC
-                paused = true;
-                break;
-        }
-    } else {
-        switch(n) {
-            case 27:        // ESC
-                paused = false;
-                break;
+    loop() {
+        if (state === 0) {
+            graphics.drawBackground();
+            graphics.drawState(this.score, this.lines, this.level);
+            if (this.a === 0) {
+                active.update();
+                this.a = this.speed;
+            }
+            this.a--;
+            graphics.drawBlocks(active.getPiece(), active.getType());
+            graphics.drawFuture(active.getFuturePieces(), active.getFuturePieceTypes());
+            playfield.update();
+        } else if (state === 1) {
+            graphics.pause();
+        } else {
+            graphics.gameOver();
         }
     }
-}
 
-/* Function to handle keyboard events */
-function keyPush(evt) {
-    if([32, 37, 38, 39, 40].indexOf(evt.keyCode) > -1) {
-        evt.preventDefault();
+    newGame() {    
+        playfield = new Playfield();
+        active = new Tetromino();
+
+        this.score = 0;
+        this.lines = 0;
+        this.level = 1;
+
+        this.a = 0;
+        this.speed = 60;
+        state = 0;
     }
-    action(evt.keyCode);
+
+    gameOver() {
+        state= 2;
+    }
+
+    togglePause() {
+        if (state === 1) {
+            state = 0;
+        }
+        if (state === 0) {
+            state = 1;
+        }
+    }
+
+    start() {
+        setInterval(this.loop, 1000/120);
+    }
+    
+    action(n) {
+        if (state !== 1) {
+            switch(n) {
+                case 37:        // Left Arrow
+                case 65:        // A
+                    active.move(new Vec2(-1, 0));
+                    break;
+                case 38:        // Up Arrow
+                case 87:        // W
+                    active.rotate();
+                    break;
+                case 39:        // Right Arrow
+                case 68:        // D
+                    active.move(new Vec2(1, 0));
+                    break;
+                case 40:        // Down Arrow
+                case 83:        // S
+                    active.move(new Vec2(0, 1));
+                    break;
+                case 82:        // R
+                    this.newGame();
+                    break;
+                case 27:        // ESC
+                    state = 1;
+                    break;
+            }
+        } else {
+            switch(n) {
+                case 27:        // ESC
+                    state = 0;
+                    break;
+            }
+        }
+    }
 }
-
-/* Finally starting the game */
-var graphics = new Graphics();
-var playfield = new Playfield();
-var active = new Tetromino();
-
-var score = 0;
-var lines = 0;
-var level = 1;
-var a = 0;
-var paused = false;
-var dead = false;
-setInterval(mainLoop, 1000/120);

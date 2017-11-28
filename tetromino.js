@@ -1,5 +1,5 @@
 class Tetromino {
-    constructor(pieces) {
+    constructor() {
         this.pieces = [
             [[new Vec2(-1,  0), new Vec2( 0,  0), new Vec2( 1, 0), new Vec2(2, 0)], 1, 7],  // I
             [[new Vec2(-1, -1), new Vec2( 0, -1), new Vec2(-1, 0), new Vec2(0, 0)], 1, 9],  // O
@@ -12,7 +12,7 @@ class Tetromino {
 
         this.futurePieces = [];
 
-        for (var i = 0; i < show; i++) {
+        for (var i = 0; i < 3; i++) {
             this.futurePieces.push(rand(0, 7));
         }
         this.next();

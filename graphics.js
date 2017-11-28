@@ -36,7 +36,7 @@ class Graphics {
         this.sdp.fillRect(0, 0, this.sCanv.width, this.sCanv.height);
     }
 
-    drawState() {
+    drawState(score, lines, level) {
         this.sdp.fillStyle = "#008FFF";
         this.sdp.font = "30px Roboto";
         this.sdp.fillText("Score: " + score, 10, 30);

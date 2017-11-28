@@ -78,8 +78,7 @@ class Playfield {
     /* Adds the block to the grid with it's color */
     append(block, color) {
         if (block.y < 0) {
-            dead = true;
-            return;
+            game.gameOver();
         }
         this.grid[block.x][block.y] = color;
     }
