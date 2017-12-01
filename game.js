@@ -81,6 +81,9 @@ class Game {
                 case 83:        // S
                     active.move(new Vec2(0, 1));
                     break;
+                case 32:        // Space
+                    active.hardDrop();
+                    break;
                 case 82:        // R
                     this.newGame();
                     break;

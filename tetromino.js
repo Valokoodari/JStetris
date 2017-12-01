@@ -93,8 +93,8 @@ class Tetromino {
         }
     }
 
-    drop() {
-        while (this.move(new Vec2(0, 1)) && !paused) {
+    hardDrop() {
+        while (this.move(new Vec2(0, 1))) {
 
         }
     }

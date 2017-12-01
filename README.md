@@ -8,7 +8,8 @@ more in the projects I do.
 # Controls
 * Left or A - Move left
 * Right or D - Move right
-* Down or S - Hard Drop
+* Down or S - Soft Drop
 * Up or W - Rotate
+* Space - Hard Drop
 * Esc - Pause
 * R - Reset
